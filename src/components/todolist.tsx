@@ -122,9 +122,7 @@ export default function TodoList() {
         deadline: updatedTask.deadline,
       });
 
-      setTasks(
-        tasks.map((t) => (t.id === task.id ? updatedTask : t))
-      );
+      setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
     }
   };
 
@@ -145,16 +143,16 @@ export default function TodoList() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
-      <h1 className="text-2xl text-emerald-500 font-bold mb-4 text-center">
-        To-Do List
+    <div className="max-w-md mx-auto mt-10 p-6 bg-blue-50 shadow-lg rounded-2xl border border-blue-100">
+      <h1 className="text-3xl text-blue-600 font-bold mb-6 text-center">
+        🌤️ To-Do List
       </h1>
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-5">
         <button
           onClick={addTask}
-          className="bg-slate-500 hover:bg-slate-600 text-white px-4 py-2 rounded-lg"
+          className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-4 py-2 rounded-lg transition duration-200 shadow"
         >
-          Tambah Tugas
+          + Tambah Tugas
         </button>
       </div>
       <ul>
@@ -163,10 +161,10 @@ export default function TodoList() {
             const timeLeft = calculateTimeRemaining(task.deadline);
             const isExpired = timeLeft === 'Waktu habis!';
             const taskColor = task.completed
-              ? 'bg-green-200'
+              ? 'bg-green-100 border-green-200'
               : isExpired
-              ? 'bg-red-200'
-              : 'bg-yellow-200';
+              ? 'bg-red-100 border-red-200'
+              : 'bg-white border-blue-200';
 
             return (
               <motion.li
@@ -175,15 +173,15 @@ export default function TodoList() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className={`flex flex-col justify-between p-3 mb-2 border rounded-xl ${taskColor} hover:scale-[1.01] hover:shadow-md transition-all duration-200`}
+                className={`flex flex-col justify-between p-3 mb-3 border rounded-xl ${taskColor} hover:shadow-md transition-all`}
               >
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center mb-1">
                   <span
                     onClick={() => toggleTask(task.id)}
-                    className={`cursor-pointer transition-500 ${
+                    className={`cursor-pointer ${
                       task.completed
                         ? 'line-through text-gray-500'
-                        : 'font-semibold text-gray-700'
+                        : 'font-semibold text-blue-700'
                     }`}
                   >
                     {task.text}
@@ -191,22 +189,22 @@ export default function TodoList() {
                   <div className="flex gap-1">
                     <button
                       onClick={() => editTask(task)}
-                      className="text-white p-1 px-2 rounded bg-blue-600 hover:bg-blue-800 text-sm"
+                      className="bg-blue-400 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => deleteTask(task.id)}
-                      className="text-white p-1 px-2 rounded bg-red-600 hover:bg-red-800 text-sm"
+                      className="bg-red-500 hover:bg-red-600 text-white text-xs px-2 py-1 rounded"
                     >
                       Hapus
                     </button>
                   </div>
                 </div>
-                <p className="text-sm text-gray-700">
-                  Deadline: {new Date(task.deadline).toLocaleString()}
+                <p className="text-sm text-gray-600">
+                  📅 Deadline: {new Date(task.deadline).toLocaleString()}
                 </p>
-                <p className="text-xs font-semibold text-gray-700">
+                <p className="text-xs text-blue-500 font-medium">
                   ⏳ {timeRemaining[task.id] || 'Menghitung...'}
                 </p>
               </motion.li>

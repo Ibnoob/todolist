@@ -21,9 +21,7 @@ type Task = {
 
 export default function TodoList() {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState<{ [key: string]: string }>(
-    {}
-  );
+  const [timeRemaining, setTimeRemaining] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -41,7 +39,11 @@ export default function TodoList() {
     const interval = setInterval(() => {
       const newTimeRemaining: { [key: string]: string } = {};
       tasks.forEach((task) => {
-        newTimeRemaining[task.id] = calculateTimeRemaining(task.deadline);
+        if (!task.completed) {
+          newTimeRemaining[task.id] = calculateTimeRemaining(task.deadline);
+        } else {
+          newTimeRemaining[task.id] = 'Selesai';
+        }
       });
       setTimeRemaining(newTimeRemaining);
     }, 1000);
@@ -63,10 +65,8 @@ export default function TodoList() {
     return `${hours}j ${minutes}m ${seconds}d`;
   };
 
-  const showToast = (title: string, icon: 'success' | 'info') => {
-    Swal.fire({
-      toast: true,
-      position: 'top-end',
+  const showPopup = async (title: string, icon: 'success' | 'info') => {
+    await Swal.fire({
       icon,
       title,
       showConfirmButton: false,
@@ -106,7 +106,7 @@ export default function TodoList() {
       };
       const docRef = await addDoc(collection(db, 'tasks'), newTask);
       setTasks([...tasks, { id: docRef.id, ...newTask }]);
-      showToast('Tugas berhasil ditambahkan!', 'success');
+      await showPopup('Tugas berhasil ditambahkan!', 'success');
     }
   };
 
@@ -118,7 +118,7 @@ export default function TodoList() {
         `<input id="swal-input2" type="datetime-local" class="swal2-input" value="${task.deadline}">`,
       focusConfirm: false,
       showCancelButton: true,
-      confirmButtonText: 'Update',
+      confirmButtonText: 'Simpan',
       cancelButtonText: 'Batal',
       confirmButtonColor: '#2563EB',
       cancelButtonColor: '#9CA3AF',
@@ -146,7 +146,7 @@ export default function TodoList() {
       });
 
       setTasks(tasks.map((t) => (t.id === task.id ? updatedTask : t)));
-      showToast('Tugas berhasil diubah!', 'success');
+      await showPopup('Tugas berhasil diubah!', 'success');
     }
   };
 
@@ -155,18 +155,35 @@ export default function TodoList() {
       task.id === id ? { ...task, completed: !task.completed } : task
     );
     setTasks(updatedTasks);
+
     const taskRef = doc(db, 'tasks', id);
     await updateDoc(taskRef, {
       completed: updatedTasks.find((task) => task.id === id)?.completed,
     });
 
-    showToast('Tugas selesai!', 'info');
+    const justCompleted = updatedTasks.find((t) => t.id === id)?.completed;
+    if (justCompleted) {
+      await showPopup('Tugas selesai!', 'info');
+    }
   };
 
   const deleteTask = async (id: string): Promise<void> => {
-    await deleteDoc(doc(db, 'tasks', id));
-    setTasks(tasks.filter((task) => task.id !== id));
-    showToast('Tugas telah dihapus.', 'info');
+    const result = await Swal.fire({
+      title: 'Apakah Anda yakin ingin menghapus tugas ini?',
+      showCancelButton: true,
+      confirmButtonText: 'Iya',
+      cancelButtonText: 'Tidak',
+      confirmButtonColor: '#DC2626',
+      cancelButtonColor: '#9CA3AF',
+      background: '#1E293B',
+      color: '#F1F5F9',
+    });
+
+    if (result.isConfirmed) {
+      await deleteDoc(doc(db, 'tasks', id));
+      setTasks(tasks.filter((task) => task.id !== id));
+      await showPopup('Tugas telah dihapus.', 'info');
+    }
   };
 
   return (
@@ -187,7 +204,7 @@ export default function TodoList() {
                   new Date(a.deadline).getTime() - new Date(b.deadline).getTime()
               )
               .map((task) => {
-                const timeLeft = calculateTimeRemaining(task.deadline);
+                const timeLeft = timeRemaining[task.id] || 'Menghitung...';
                 const taskColor = task.completed
                   ? 'bg-blue-100'
                   : timeLeft === 'Waktu habis!'
@@ -229,11 +246,11 @@ export default function TodoList() {
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 mt-2">
+                    <p className={`text-sm mt-2 ${task.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
                       ⏰ Deadline: {new Date(task.deadline).toLocaleString()}
                     </p>
-                    <p className="text-xs font-medium text-gray-600">
-                      ⏳ {timeRemaining[task.id] || 'Menghitung...'}
+                    <p className={`text-xs font-medium ${task.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                      ⏳ {task.completed ? 'Selesai' : timeLeft}
                     </p>
                   </motion.li>
                 );

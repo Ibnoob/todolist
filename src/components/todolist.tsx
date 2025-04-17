@@ -195,6 +195,14 @@ export default function TodoList() {
         <p className="text-lg text-gray-700 text-center mb-6">
           Kelola tugas-tugas harianmu dengan mudah dan terorganisir.
         </p>
+             <div className="flex justify-end mt-8">
+          <button
+            onClick={addTask}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow-md"
+          >
+            + Tambah Tugas
+          </button>
+        </div>
 
         <ul className="space-y-4">
           <AnimatePresence>
@@ -257,15 +265,7 @@ export default function TodoList() {
               })}
           </AnimatePresence>
         </ul>
-
-        <div className="flex justify-end mt-8">
-          <button
-            onClick={addTask}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow-md"
-          >
-            + Tambah Tugas
-          </button>
-        </div>
+        
       </div>
     </div>
   );

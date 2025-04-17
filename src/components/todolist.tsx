@@ -195,7 +195,9 @@ export default function TodoList() {
         <p className="text-lg text-gray-700 text-center mb-6">
           Kelola tugas-tugas harianmu dengan mudah dan terorganisir.
         </p>
-             <div className="flex justify-end mt-8">
+
+        {/* Tombol Tambah Tugas di Tengah */}
+        <div className="flex justify-center mt-6 mb-6">
           <button
             onClick={addTask}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full shadow-md"
@@ -204,6 +206,7 @@ export default function TodoList() {
           </button>
         </div>
 
+        {/* Daftar Tugas */}
         <ul className="space-y-4">
           <AnimatePresence>
             {[...tasks]
@@ -254,10 +257,18 @@ export default function TodoList() {
                         </button>
                       </div>
                     </div>
-                    <p className={`text-sm mt-2 ${task.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                    <p
+                      className={`text-sm mt-2 ${
+                        task.completed ? 'line-through text-gray-400' : 'text-gray-600'
+                      }`}
+                    >
                       ⏰ Deadline: {new Date(task.deadline).toLocaleString()}
                     </p>
-                    <p className={`text-xs font-medium ${task.completed ? 'line-through text-gray-400' : 'text-gray-600'}`}>
+                    <p
+                      className={`text-xs font-medium ${
+                        task.completed ? 'line-through text-gray-400' : 'text-gray-600'
+                      }`}
+                    >
                       ⏳ {task.completed ? 'Selesai' : timeLeft}
                     </p>
                   </motion.li>
@@ -265,7 +276,6 @@ export default function TodoList() {
               })}
           </AnimatePresence>
         </ul>
-        
       </div>
     </div>
   );
